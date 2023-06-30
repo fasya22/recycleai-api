@@ -337,3 +337,81 @@ class ResetPassword(Resource):
             response = make_response(render_template('response.html', success=False, message='Reset password failed'), 400)
             response.headers['Content-Type'] = 'text/html'
             return response
+
+# Sampah 
+class Sampah(db.Model):
+    id = db.Column(db.Integer(),primary_key=True,nullable=False)
+    created_at = db.Column(db.String(255),nullable=False)
+    plastic = db.Column(db.String(255),nullable=False)
+    glass = db.Column(db.String(255),nullable=False)
+    metal = db.Column(db.String(255),nullable=False)
+    paper = db.Column(db.String(255),nullable=False)
+    ewaste = db.Column(db.String(255),nullable=False)
+    def serialize(row):
+        return {
+            "id" : str(row.id),
+            "created_at" : row.created_at,
+            "plastic" : row.plastic,
+            "glass" : row.glass,
+            "metal" : row.metal,
+            "paper" : row.paper,
+            "ewaste" : row.ewaste
+
+        } 
+
+
+parser4ListSampah = reqparse.RequestParser()
+parser4ListSampah.add_argument('plastic', type=str, help='plastic', location='json', required=True)
+parser4ListSampah.add_argument('glass', type=str, help='glass', location='json', required=True)
+parser4ListSampah.add_argument('metal', type=str, help='metal', location='json', required=True)
+parser4ListSampah.add_argument('paper', type=str, help='paper', location='json', required=True)
+parser4ListSampah.add_argument('ewaste', type=str, help='ewaste', location='json', required=True)
+
+@api.route('/list/sampah')
+class NewSampah(Resource):
+    @api.expect(parser4ListSampah)
+    def post(self):
+        args = parser4ListSampah.parse_args()
+        plastic = args['plastic']
+        glass = args['glass']
+        metal = args['metal']
+        paper = args['paper']
+        ewaste = args['ewaste']
+
+        try:
+            sampah = Sampah(plastic=plastic, glass=glass, metal=metal, paper=paper, ewaste=ewaste)
+
+            db.session.add(sampah)
+            db.session.commit()
+
+            return {
+                'message' : "Berhasil"
+            }, 201
+        except Exception as e:
+            print(e)
+            return {
+                'message' : f"Error {e}"
+            }, 500
+
+@api.route("/sampah")
+class GetAllSampah(Resource):
+    def get(self):
+        
+        try:
+            
+            sampah = db.session.execute(db.select(Sampah)
+            .order_by(Sampah.id))
+
+            sampah = Sampah.query.all()
+            sampahx = [Sampah.serialize(x) for x in sampah]
+            
+            return make_response(
+                {
+                    "message":"Success",
+                    "data": sampahx
+                },200
+            )
+               
+        except Exception as e:
+            print(f"{e}")
+            return {'message': f'Failed {e}'}, 400
