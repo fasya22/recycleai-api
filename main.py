@@ -6,6 +6,7 @@ from flask_mail import Mail, Message
 from flask_restx import Resource, Api, reqparse
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash,check_password_hash
+import datetime
 
 import jwt
 
@@ -367,6 +368,32 @@ parser4ListSampah.add_argument('metal', type=str, help='metal', location='json',
 parser4ListSampah.add_argument('paper', type=str, help='paper', location='json', required=True)
 parser4ListSampah.add_argument('ewaste', type=str, help='ewaste', location='json', required=True)
 
+# @api.route('/list/sampah')
+# class NewSampah(Resource):
+#     @api.expect(parser4ListSampah)
+#     def post(self):
+#         args = parser4ListSampah.parse_args()
+#         plastic = args['plastic']
+#         glass = args['glass']
+#         metal = args['metal']
+#         paper = args['paper']
+#         ewaste = args['ewaste']
+
+#         try:
+#             sampah = Sampah(plastic=plastic, glass=glass, metal=metal, paper=paper, ewaste=ewaste)
+
+#             db.session.add(sampah)
+#             db.session.commit()
+
+#             return {
+#                 'message' : "Berhasil"
+#             }, 201
+#         except Exception as e:
+#             print(e)
+#             return {
+#                 'message' : f"Error {e}"
+#             }, 500
+
 @api.route('/list/sampah')
 class NewSampah(Resource):
     @api.expect(parser4ListSampah)
@@ -379,7 +406,9 @@ class NewSampah(Resource):
         ewaste = args['ewaste']
 
         try:
-            sampah = Sampah(plastic=plastic, glass=glass, metal=metal, paper=paper, ewaste=ewaste)
+            created_at = datetime.datetime.now()  # Set the created_at value to the current datetime
+
+            sampah = Sampah(created_at=created_at, plastic=plastic, glass=glass, metal=metal, paper=paper, ewaste=ewaste)
 
             db.session.add(sampah)
             db.session.commit()
@@ -392,6 +421,7 @@ class NewSampah(Resource):
             return {
                 'message' : f"Error {e}"
             }, 500
+
 
 @api.route("/sampah")
 class GetAllSampah(Resource):
