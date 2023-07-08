@@ -7,7 +7,6 @@ from flask_restx import Resource, Api, reqparse
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash,check_password_hash
 import datetime
-
 import jwt
 
 app = Flask(__name__, template_folder='templates')
